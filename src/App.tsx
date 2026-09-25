@@ -8,6 +8,7 @@ import { Directions } from './pages/Directions'
 import { Portfolio } from './pages/Portfolio'
 import { Outlook } from './pages/Outlook'
 import { Resources } from './pages/Resources'
+import { MindMaps } from './pages/MindMaps'
 import { NotFound } from './pages/NotFound'
 
 export default function App() {
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/outlook" element={<Outlook />} />
             <Route path="/resources" element={<Resources />} />
+            <Route path="/mindmaps" element={<MindMaps />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Shell>

@@ -8,7 +8,10 @@ export function ResourceCard({ resource }: { resource: Resource }) {
   const bookmarked = isBookmarked(resource.id)
 
   return (
-    <div className="flex items-start gap-3 rounded-md border border-line bg-bg-raised/50 p-3 transition-colors hover:border-accent/40">
+    <div
+      id={resource.id}
+      className="flex items-start gap-3 rounded-md border border-line bg-bg-raised/50 p-3 transition-colors hover:border-accent/40"
+    >
       <button
         type="button"
         onClick={() => toggleResourceBookmark(resource.id)}

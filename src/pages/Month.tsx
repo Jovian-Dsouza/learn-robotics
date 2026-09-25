@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { lazy, Suspense, useEffect } from 'react'
+import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
 import { getMonthBySlug, months } from '@/content'
 import { Designator } from '@/components/ui/Card'
 import { ProgressRing } from '@/components/ui/ProgressRing'
@@ -7,17 +7,54 @@ import { SectionBlock } from '@/components/roadmap/SectionBlock'
 import { MilestoneList } from '@/components/roadmap/MilestoneList'
 import { Static3DFallback } from '@/components/three/Static3DFallback'
 import { useCanRender3D } from '@/components/three/useCanRender3D'
+import { prefersReducedMotion } from '@/components/three/support'
+import { MILESTONES_BRANCH_ID } from '@/mindmap/layout'
 import { useProgress } from '@/progress/useProgress'
 import { monthPercent } from '@/progress/selectors'
 
 const MonthIconScene = lazy(() => import('@/components/three/MonthIconScene'))
 const MONTH_ICON_SIZE = 72
+const HIGHLIGHT_DURATION_MS = 1600
+
+/** Scrolls to and briefly highlights a `?scrollTo=<id>` target from search/mind-map links, then clears the param. */
+function useScrollToTarget() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const scrollTo = searchParams.get('scrollTo')
+
+  useEffect(() => {
+    if (!scrollTo) return
+    const target = document.getElementById(scrollTo)
+    if (!target) return
+
+    // Checkbox ids live on a visually-hidden <input> — highlight the visible
+    // <label> row instead so the pulse is actually seen. Other targets
+    // (a <section>, a resource card) already are the visible container.
+    const highlightEl = target.closest('label') ?? target
+
+    target.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'center' })
+    highlightEl.classList.add('search-highlight')
+    // Clearing the ?scrollTo param happens in this same timeout, not
+    // synchronously — doing it right away would flip `scrollTo` to null on
+    // the next render, re-running this effect and firing its cleanup
+    // (which strips the highlight class) before the pulse is ever seen.
+    const timer = setTimeout(() => {
+      highlightEl.classList.remove('search-highlight')
+      setSearchParams({}, { replace: true })
+    }, HIGHLIGHT_DURATION_MS)
+
+    return () => {
+      clearTimeout(timer)
+      highlightEl.classList.remove('search-highlight')
+    }
+  }, [scrollTo, setSearchParams])
+}
 
 export function MonthPage() {
   const { slug } = useParams<{ slug: string }>()
   const month = slug ? getMonthBySlug(slug) : undefined
   const { progress } = useProgress()
   const canRender3D = useCanRender3D()
+  useScrollToTarget()
 
   if (!month) return <Navigate to="/" replace />
 
@@ -58,7 +95,7 @@ export function MonthPage() {
         ))}
       </div>
 
-      <section className="mt-14 rounded-lg border border-done/30 bg-done-soft p-5">
+      <section id={MILESTONES_BRANCH_ID} className="mt-14 rounded-lg border border-done/30 bg-done-soft p-5">
         <Designator className="text-done">MILESTONE CHECK</Designator>
         <h2 className="mt-1 font-display text-xl text-ink">Month {month.number} milestone</h2>
         <div className="mt-3">

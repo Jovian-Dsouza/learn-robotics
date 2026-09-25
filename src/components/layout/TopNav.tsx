@@ -8,9 +8,16 @@ const LINKS = [
   { to: '/portfolio', label: 'Portfolio' },
   { to: '/outlook', label: 'Outlook' },
   { to: '/resources', label: 'Resources' },
+  { to: '/mindmaps', label: 'Mind Maps' },
 ]
 
-export function TopNav() {
+const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform ?? navigator.userAgent)
+
+interface TopNavProps {
+  onOpenSearch: () => void
+}
+
+export function TopNav({ onOpenSearch }: TopNavProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 sm:px-6">
@@ -38,6 +45,21 @@ export function TopNav() {
             </NavLink>
           ))}
         </nav>
+        <button
+          type="button"
+          onClick={onOpenSearch}
+          aria-label="Search the roadmap"
+          className="flex shrink-0 items-center gap-2 rounded-md border border-line px-2.5 py-1.5 font-mono text-xs text-ink-muted transition-colors hover:border-accent/50 hover:text-ink"
+        >
+          <svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true">
+            <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.4" />
+            <path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+          </svg>
+          <span className="hidden md:inline">Search</span>
+          <kbd className="hidden rounded border border-line px-1 text-[0.6rem] text-ink-faint md:inline">
+            {isMac ? '⌘K' : 'Ctrl K'}
+          </kbd>
+        </button>
         <LevelBadge variant="compact" className="hidden shrink-0 border-l border-line pl-4 sm:flex" />
       </div>
     </header>

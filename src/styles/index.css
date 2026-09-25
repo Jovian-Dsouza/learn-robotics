@@ -49,6 +49,17 @@
       stroke-dashoffset: 0;
     }
   }
+
+  @keyframes search-highlight-pulse {
+    0% {
+      box-shadow: 0 0 0 3px var(--color-accent);
+      background-color: var(--color-accent-soft);
+    }
+    100% {
+      box-shadow: 0 0 0 0 transparent;
+      background-color: transparent;
+    }
+  }
 }
 
 @layer base {
@@ -85,6 +96,13 @@
   }
   .font-mono {
     font-family: var(--font-mono);
+  }
+
+  /* Applied imperatively (see Month.tsx's useScrollToTarget) to whatever a
+     search/mind-map link jumped to, so the destination is unmistakable. */
+  .search-highlight {
+    border-radius: 0.375rem;
+    animation: search-highlight-pulse 1.6s ease-out;
   }
 }
 
